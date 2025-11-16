@@ -2,8 +2,6 @@
 
 AI-powered churn prediction system combining Google Gemini and Qdrant vector similarity search to identify at-risk customers before they leave.
 
-**🏆 Built for 12-hour hackathon - Complete production-ready implementation**
-
 ---
 
 ## 🎯 Overview
