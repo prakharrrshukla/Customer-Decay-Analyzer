@@ -16,6 +16,7 @@ This hybrid approach achieves superior prediction accuracy compared to either me
 ### Key Features
 
 ✅ **Real-time Risk Assessment** - Comprehensive analysis in 3-7 seconds  
+✅ **Preprocessed Demo Data** - 100 customers with instant loading (no API limits)  
 ✅ **Predictive Churn Dates** - Estimate when customers will likely leave  
 ✅ **Intervention Priority** - Rank customers by urgency and revenue impact  
 ✅ **Revenue at Risk** - Calculate 12-month lifetime value at stake  
@@ -81,9 +82,10 @@ customer-decay-backend/
 ├── tests/                       # Test suite
 │   └── test_pipeline.py         # Comprehensive pytest suite
 ├── data/                        # Data files
-│   ├── customers.csv            # 30 customers (3 tiers)
-│   ├── behavior_events.csv      # 2500+ behavioral events
+│   ├── customers.csv            # 100 customers (3 tiers)
+│   ├── behavior_events.csv      # 7000+ behavioral events
 │   ├── churned_customers.csv    # 20 churned for training
+│   ├── preprocessed_analysis.json # Pre-calculated risk scores
 │   └── analysis_all.json/csv    # Batch analysis results
 ├── app.py                       # Flask application
 ├── requirements.txt             # Python dependencies
@@ -141,17 +143,42 @@ PORT=5000
 HOST=0.0.0.0
 ```
 
-### 3. Generate Sample Data
+### 3. Generate Sample Data (Quick Setup)
+
+**🚀 One-Command Setup (Recommended for Demos)**
 
 ```powershell
-# Create 30 customers, 2500+ events, 20 churned customers
+# Windows
+.\scripts\quick_setup.bat
+
+# Linux/Mac
+chmod +x scripts/quick_setup.sh
+./scripts/quick_setup.sh
+```
+
+This single command will:
+1. Generate 100 customers with realistic data
+2. Create preprocessed risk analysis (NO API calls!)
+3. Populate Qdrant vector database
+
+**🎯 Manual Setup (Alternative)**
+
+```powershell
+# Step 1: Generate 100 customers
 python scripts/generate_sample_data.py
+
+# Step 2: Generate preprocessed analysis (instant loading!)
+python scripts/generate_preprocessed_analysis.py
+
+# Step 3: Populate Qdrant (optional)
+python scripts/populate_qdrant.py
 ```
 
 **Output**:
-- `data/customers.csv` - 30 customers (9 Enterprise, 15 Pro, 6 Basic)
-- `data/behavior_events.csv` - 90 days of login, feature, support, payment events
+- `data/customers.csv` - 100 customers (30 Enterprise, 50 Pro, 20 Basic)
+- `data/behavior_events.csv` - 90 days of login, feature, support, payment events (7000+ events)
 - `data/churned_customers.csv` - 20 historical churns with reasons
+- `data/preprocessed_analysis.json` - **Pre-calculated risk scores for all 100 customers**
 
 ### 4. Test Connections
 
@@ -180,6 +207,56 @@ python app.py
 
 **Server**: http://localhost:5000  
 **Health**: http://localhost:5000/api/health
+
+---
+
+## 📊 Demo Data & Preprocessed Analysis
+
+### Why Preprocessed Data?
+
+This project includes **100 preprocessed customer records** with pre-calculated risk analysis to avoid API rate limits during demos and hackathons.
+
+**Problem**: Gemini API free tier has **15 requests/minute** limit  
+**Solution**: Pre-calculate risk scores for all 100 customers (loads instantly!)
+
+### Data Distribution
+
+**100 Total Customers:**
+- 🟢 **40 Healthy Customers** (CUST001-CUST040)
+  - Risk Score: 15-35
+  - High engagement, no issues
+  - Low churn risk
+  
+- 🟡 **40 Declining Customers** (CUST041-CUST080)
+  - Risk Score: 50-75
+  - Decreasing metrics over time
+  - Medium-high churn risk
+  
+- 🔴 **20 Critical Customers** (CUST081-CUST100)
+  - Risk Score: 80-100
+  - Severe decline, negative sentiment
+  - Critical churn risk
+
+### Instant Loading
+
+All API endpoints use preprocessed data by default:
+- ✅ `/api/customers/<id>/analysis` - Instant customer risk report
+- ✅ `/api/customers/at-risk` - Instant at-risk customer list  
+- ✅ `/api/analytics/stats` - Instant dashboard statistics
+
+**No AI API calls needed** = No rate limits = Smooth demos! 🚀
+
+### Refresh Preprocessed Data
+
+To regenerate analysis with updated behavioral patterns:
+
+```powershell
+# Regenerate preprocessed analysis
+python scripts/generate_preprocessed_analysis.py
+
+# OR via API endpoint
+Invoke-RestMethod -Method POST http://localhost:5000/api/customers/refresh-preprocessed-data
+```
 
 ---
 

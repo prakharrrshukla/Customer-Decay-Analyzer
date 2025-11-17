@@ -2,14 +2,14 @@
 Generate realistic sample data for Customer Decay Analyzer demo.
 
 Creates three CSV files:
-1. data/customers.csv - 30 current customers
+1. data/customers.csv - 100 current customers
 2. data/behavior_events.csv - 90 days of behavioral data
 3. data/churned_customers.csv - 20 historical churned customers
 
 Customer patterns:
-- Healthy (40%): High engagement, fast responses, no issues
-- Declining (40%): Decreasing activity, slower responses, occasional delays
-- Critical (20%): Very low activity, major delays, negative sentiment
+- Healthy (40%): CUST001-CUST040 - High engagement, fast responses, no issues
+- Declining (40%): CUST041-CUST080 - Decreasing activity, slower responses, occasional delays
+- Critical (20%): CUST081-CUST100 - Very low activity, major delays, negative sentiment
 """
 
 from __future__ import annotations
@@ -74,69 +74,64 @@ def choice_weighted(options: List[str], weights: List[float]) -> str:
 # Data Generators
 # ---------------------------
 
-def generate_customers(num_customers: int = 30) -> pd.DataFrame:
+def generate_customers(num_customers: int = 100) -> pd.DataFrame:
     """
     Generate sample customer data.
 
     Args:
-        num_customers: Number of customers to generate
+        num_customers: Number of customers to generate (default 100)
 
     Returns:
         DataFrame with columns: customer_id, company_name, signup_date,
-        subscription_tier, monthly_value
+        subscription_tier, monthly_value, email
 
     Requirements implemented:
-    - customer_id: CUST001 to CUST0XX (zero-padded)
-    - company_name: 30 unique realistic tech company names
+    - customer_id: CUST001 to CUST100 (zero-padded)
+    - company_name: 100 unique realistic tech company names
     - signup_date: Random dates between 2023-01-01 and 2024-06-01
     - subscription_tier distribution and monthly_value ranges by tier:
         * Enterprise (30%): $3000-$8000
         * Pro (50%): $800-$2000
         * Basic (20%): $100-$500
+    - email: Generated from company name
     """
     adjectives = [
-        "TechFlow",
-        "DataSync",
-        "CloudBridge",
-        "InnovateTech",
-        "PixelForge",
-        "ByteWise",
-        "NexGen",
-        "StreamLine",
-        "CodeCraft",
-        "QuantumEdge",
-        "Skyline",
-        "BluePeak",
-        "ApexLogic",
-        "NovaCore",
-        "BrightWave",
-        "EchoGrid",
-        "VectorWorks",
-        "FusionByte",
-        "CobaltCloud",
-        "AuroraSoft",
+        "TechFlow", "DataSync", "CloudBridge", "InnovateTech", "PixelForge",
+        "ByteWise", "NexGen", "StreamLine", "CodeCraft", "QuantumEdge",
+        "Skyline", "BluePeak", "ApexLogic", "NovaCore", "BrightWave",
+        "EchoGrid", "VectorWorks", "FusionByte", "CobaltCloud", "AuroraSoft",
+        "DataVault", "CloudScale", "ByteStream", "SkyBridge", "CodeWave",
+        "PixelStream", "TechNova", "DataPeak", "CloudVault", "ByteForge",
+        "SkyFlow", "CodeBridge", "PixelWise", "TechEdge", "DataWave",
+        "CloudCraft", "BytePeak", "SkyVault", "CodeSync", "PixelLogic",
+        "TechBridge", "DataForge", "CloudWise", "ByteEdge", "SkySync",
+        "CodeVault", "PixelCraft", "TechWave", "DataEdge", "CloudFlow",
+        "ByteBridge", "SkyWise", "CodeForge", "PixelEdge", "TechVault",
+        "DataCraft", "CloudSync", "ByteWave", "SkyEdge", "CodeFlow",
+        "PixelBridge", "TechCraft", "DataBridge", "CloudEdge", "ByteVault",
+        "SkyPeak", "CodeEdge", "PixelFlow", "TechSync", "DataFlow",
+        "CloudPeak", "ByteSync", "SkyForge", "CodePeak", "PixelSync",
+        "TechForge", "DataFlow", "CloudForge", "ByteFlow", "SkyCraft",
+        "CodeWave", "PixelVault", "TechFlow", "DataSync", "CloudBridge",
+        "ByteCraft", "SkyBridge", "CodeCraft", "PixelForge", "TechWise",
+        "DataWise", "CloudVault", "ByteLogic", "SkyLogic", "CodeLogic",
+        "PixelPeak", "TechPeak", "DataPeak", "CloudWave", "ByteWise",
     ]
     nouns = [
-        "Solutions",
-        "Corp",
-        "Inc",
-        "Studios",
-        "Systems",
-        "Analytics",
-        "Software",
-        "Labs",
-        "Networks",
-        "Dynamics",
-        "Technologies",
-        "Partners",
-        "Group",
+        "Solutions", "Corp", "Inc", "Studios", "Systems",
+        "Analytics", "Software", "Labs", "Networks", "Dynamics",
+        "Technologies", "Partners", "Group", "Enterprises", "Digital",
+        "Innovations", "Platforms", "Services", "Media", "Interactive",
+        "Ventures", "Cloud", "Data", "Tech", "Consulting",
     ]
 
-    # Build 30 unique company names deterministically
+    # Build 100 unique company names deterministically
     names: List[str] = []
     i = 0
     while len(names) < num_customers:
-        name = f"{adjectives[i % len(adjectives)]} {nouns[i % len(nouns)]}"
+        adj_idx = i % len(adjectives)
+        noun_idx = (i // len(adjectives)) % len(nouns)
+        name = f"{adjectives[adj_idx]} {nouns[noun_idx]}"
         if name not in names:
             names.append(name)
         i += 1
@@ -161,10 +156,15 @@ def generate_customers(num_customers: int = 30) -> pd.DataFrame:
         else:
             monthly_value = random.randint(100, 500)
 
+        # Generate email from company name
+        email_prefix = company_name.lower().replace(" ", "").replace(".", "")[:15]
+        email = f"contact@{email_prefix}.com"
+
         records.append(
             {
                 "customer_id": customer_id,
                 "company_name": company_name,
+                "email": email,
                 "signup_date": signup.isoformat(),
                 "subscription_tier": tier,
                 "monthly_value": float(monthly_value),
@@ -202,9 +202,9 @@ def generate_behavior_events(customers_df: pd.DataFrame) -> pd.DataFrame:
         metric_value, notes
 
     Customer behavior patterns are defined for three cohorts:
-    - Healthy (CUST001-CUST012)
-    - Declining (CUST013-CUST024)
-    - Critical (CUST025-CUST030)
+    - Healthy (CUST001-CUST040): 40% - High engagement, no issues
+    - Declining (CUST041-CUST080): 40% - Decreasing metrics over time
+    - Critical (CUST081-CUST100): 20% - Severe decline, negative sentiment
     """
     today = date.today()
     start = today - timedelta(days=89)
@@ -215,15 +215,15 @@ def generate_behavior_events(customers_df: pd.DataFrame) -> pd.DataFrame:
     p3_start = start + timedelta(days=60)
 
     def is_healthy(cid: str) -> bool:
-        return 1 <= int(cid[-3:]) <= 12
+        return 1 <= int(cid[-3:]) <= 40
 
     def is_declining(cid: str) -> bool:
         n = int(cid[-3:])
-        return 13 <= n <= 24
+        return 41 <= n <= 80
 
     def is_critical(cid: str) -> bool:
         n = int(cid[-3:])
-        return 25 <= n <= 30
+        return 81 <= n <= 100
 
     support_notes_healthy = [
         "Quick question about API",
@@ -516,8 +516,8 @@ def main() -> None:
     data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
     ensure_data_dir(data_dir)
 
-    print("Generating customers (30)...")
-    customers_df = generate_customers(30)
+    print("Generating customers (100)...")
+    customers_df = generate_customers(100)
     customers_path = os.path.join(data_dir, "customers.csv")
     customers_df.to_csv(customers_path, index=False)
 
