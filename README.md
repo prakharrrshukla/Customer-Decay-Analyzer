@@ -260,6 +260,38 @@ Invoke-RestMethod -Method POST http://localhost:5000/api/customers/refresh-prepr
 
 ---
 
+## 🚂 Deploy to Production
+
+### Railway Deployment (Recommended)
+
+Deploy to Railway in 5 minutes:
+
+```bash
+# 1. Push your code to GitHub
+git add .
+git commit -m "Ready for deployment"
+git push origin main
+
+# 2. Go to https://railway.app/
+# 3. Click "Deploy from GitHub repo"
+# 4. Select your repository
+# 5. Add environment variables (see below)
+# 6. Deploy!
+```
+
+**Required Environment Variables:**
+- `GEMINI_API_KEY` - Your Gemini API key
+- `QDRANT_URL` - Your Qdrant Cloud URL
+- `QDRANT_API_KEY` - Your Qdrant API key
+- `SECRET_KEY` - Production secret key
+- `FLASK_DEBUG=False`
+
+**📖 Complete Guide:** See [RAILWAY_DEPLOY.md](RAILWAY_DEPLOY.md)
+
+Your API will be live at: `https://your-app.up.railway.app`
+
+---
+
 ## 🧪 Testing
 
 ### Quick Test
