@@ -582,10 +582,6 @@ Built with:
 - Google Gemini API for AI-powered insights
 - Qdrant for vector similarity search
 - Flask for rapid API development
-- ChatGPT/Copilot for code assistance
-
 ---
 
-**Happy Hacking! 🚀**
 
-*Built in 12 hours for [Hackathon Name] - Demonstrating the power of AI-driven customer retention*
